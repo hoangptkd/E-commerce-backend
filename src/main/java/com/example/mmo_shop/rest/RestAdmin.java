@@ -23,7 +23,6 @@ public class RestAdmin {
     ) {
         return userService.findAll(page,size,sortBy,sortDir);
     }
-
     @PutMapping("/editStatus/{userId}")
     public User editStatus(@PathVariable int userId,@RequestParam Status status) {
         User user = userService.findByID(userId);

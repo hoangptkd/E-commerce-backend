@@ -39,4 +39,6 @@ public interface ProductService {
     Page<Product> findSpecialProduct(int page, int size, String sortBy,int categoryId);
 
     Product update(Product product);
+
+    void updateBuyersCount(Product product,int quantity);
 }

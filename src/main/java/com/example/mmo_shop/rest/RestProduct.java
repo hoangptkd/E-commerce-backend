@@ -34,9 +34,6 @@ public class RestProduct {
         this.imageService = imageService;
     }
 
-    @Autowired
-    private ShopRepository shopRepository;
-
 
     @PostMapping("/upload")
     public String uploadImage(@RequestParam("image") MultipartFile file) {
@@ -116,20 +113,18 @@ public class RestProduct {
     public List<Product> getProductsByShop() {
         User user = SecurityService.getAuth();
         int shopId = user.getShop().getId();
-        List<Product> productsByShop = productService.findByShop(shopId);
-        return productsByShop;
+        return productService.findByShop(shopId);
     }
 
     @GetMapping("/{productId}/similar")
     public List<Product> getSimilarProducts(@PathVariable int productId) {
         Product currentProduct = productService.findByID(productId);
         // Lấy danh sách sản phẩm tương tự
-        List<Product> similarProducts = productService.findSimilarProducts(
+
+        return productService.findSimilarProducts(
                 currentProduct.getCategory().getId(),
                 productId
         );
-
-        return similarProducts;
 
     }
     @PostMapping("/add")
@@ -157,4 +152,6 @@ public class RestProduct {
     public Product deleteProduct(@PathVariable int productId ) {
         return productService.deleteByID(productId);
     }
+
+
 }

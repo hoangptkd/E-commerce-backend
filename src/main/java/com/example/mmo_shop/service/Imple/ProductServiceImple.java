@@ -5,6 +5,7 @@ import com.example.mmo_shop.dao.repository.CategoryRepository;
 import com.example.mmo_shop.dao.repository.ProductRepository;
 import com.example.mmo_shop.dao.repository.ProductVersionRepository;
 import com.example.mmo_shop.dao.repository.ShopRepository;
+import com.example.mmo_shop.dao.specification.ProductSpecification;
 import com.example.mmo_shop.service.ProductService;
 import com.example.mmo_shop.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,8 +50,11 @@ public class ProductServiceImple implements ProductService {
     public Set<Category> getCategoriesBySearch(String name) {
         List<Product> productsBySearch = productRepository.findByNameContainingIgnoreCase(name);
         Map<Category,List<Product>> categoryMap = productsBySearch.stream().filter(product -> product.getCategory() != null).collect(Collectors.groupingBy(
-             Product::getCategory
+             Product::getCategory,
+            LinkedHashMap::new,
+            Collectors.toList()
         ));
+
         return categoryMap.keySet();
     }
 
@@ -125,34 +127,22 @@ public class ProductServiceImple implements ProductService {
         } else {
             pageable = PageRequest.of(page, size);
         }
-        if (categoryId == 0 && priceTo ==0) {
-            return productRepository.findByNameContainingIgnoreCaseAndStatus(name,1,pageable);
-        } else if (categoryId != 0 && priceTo ==0) {
-            Category category =categoryRepository.findById(categoryId).orElse(null);
-            return productRepository.findByNameContainingIgnoreCaseAndStatusAndCategory(name,1,category,pageable);
-        } else if (categoryId == 0 && priceTo !=0) {
 
-            return productRepository.findByNameContainingIgnoreCaseAndStatusAndPriceBetween(name,1,priceFrom,priceTo,pageable);
-        } else {
-            Category category =categoryRepository.findById(categoryId).orElse(null);
-            return productRepository.findByNameContainingIgnoreCaseAndStatusAndCategoryAndPriceBetween(name,1,category,priceFrom,priceTo,pageable);
+        /*Specification*/
+        Specification<Product> spec = Specification.where(null);
+        if (name != null && !name.trim().isEmpty()) {
+            spec = spec.and(ProductSpecification.hasName(name));
         }
-
+        if (categoryId != 0) {
+            spec = spec.and(ProductSpecification.hasCategory(categoryId));
+        }
+        if (priceTo != 0) {
+            spec = spec.and(ProductSpecification.hasPriceBetween(priceFrom, priceTo));
+        }
+        spec = spec.and(ProductSpecification.hasStatus(1));
+        return productRepository.findAll(spec,pageable);
     }
-//    @Override
-//    public Page<Product> search(String name, int page, int size, String sortBy, String sortDir, int categoryId) {
-//        Pageable pageable;
-//        if (sortBy != null && !sortBy.isEmpty()) {
-//            Sort sort = sortDir.equalsIgnoreCase("asc")
-//                    ? Sort.by(sortBy).ascending()
-//                    : Sort.by(sortBy).descending();
-//            pageable = PageRequest.of(page, size,sort);
-//        } else {
-//            pageable = PageRequest.of(page, size);
-//        }
-//        Category category =categoryRepository.findById(categoryId).orElse(null);
-//        return productRepository.findByNameContainingIgnoreCaseAndStatusAndCategory(name,1,category,pageable);
-//    }
+
     @Transactional
     @Override
     public Product save(Product product) {
@@ -176,6 +166,14 @@ public class ProductServiceImple implements ProductService {
         save(product);
         return product;
     }
+
+    @Override
+    public void updateBuyersCount(Product product,int quantity) {
+        int buyersCount = product.getBuyersCount();
+        product.setBuyersCount(buyersCount + quantity);
+        productRepository.save(product);
+    }
+
     @Transactional
     @Override
     public Product newSave(Product product) {
@@ -183,6 +181,8 @@ public class ProductServiceImple implements ProductService {
         save(product);
         return product;
     }
+
+
 
     @Override
     @Transactional

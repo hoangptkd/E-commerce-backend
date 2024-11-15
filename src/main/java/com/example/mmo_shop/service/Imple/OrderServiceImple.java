@@ -6,6 +6,7 @@ import com.example.mmo_shop.dao.model.entity.*;
 import com.example.mmo_shop.dao.repository.OrderItemRepository;
 import com.example.mmo_shop.dao.repository.OrderRepository;
 import com.example.mmo_shop.service.OrderService;
+import com.example.mmo_shop.service.ProductService;
 import com.example.mmo_shop.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,8 @@ public class OrderServiceImple implements OrderService {
 
     @Autowired
     private OrderItemRepository orderItemRepository;
+    @Autowired
+    private ProductService productService;
     @Override
     public List<Order> findAll() {
         return orderRepository.findAll();
@@ -62,6 +65,13 @@ public class OrderServiceImple implements OrderService {
             return null;
         }
         order.setStatus(status);
+        if (status == DeliveryStatus.received) {
+            List<OrderItem> orderItems = orderItemRepository.findAllByOrder(order);
+            orderItems.forEach(orderItem -> {
+                Product product = orderItem.getProductVersion().getProduct();
+                productService.updateBuyersCount(product,orderItem.getQuantity());
+            });
+        }
         return orderRepository.save(order);
     }
 

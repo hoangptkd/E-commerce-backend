@@ -101,6 +101,13 @@ public class Product {
         return rating;
     }
 
+    public void setBuyersCount(int buyersCount) {
+        this.buyersCount = buyersCount;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
 
     public int getBuyersCount() {
         return buyersCount;
