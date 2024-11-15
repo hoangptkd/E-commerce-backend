@@ -41,7 +41,10 @@ public class JwtUtil {
     public boolean isTokenExpired(String token) {
         return extractAllClaims(token).getExpiration().before(new Date());
     }
-
+    // Lấy thời gian hết hạn từ JWT
+    public long getExpirationTime(String token) {
+        return extractAllClaims(token).getExpiration().getTime();
+    }
     public boolean validateToken(String token, String username) {
         final String extractedUsername = extractUsername(token);
         return (extractedUsername.equals(username) && !isTokenExpired(token));

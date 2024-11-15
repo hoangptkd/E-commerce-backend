@@ -18,4 +18,7 @@ public interface UserService {
     void createUser(User user, Set<Role> roleSet);
     User updateUser(User user);
     void deleteByID(int id);
+
+
+    String logout(String jwt, long expTime);
 }

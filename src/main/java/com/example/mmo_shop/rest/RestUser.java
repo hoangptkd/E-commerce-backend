@@ -99,6 +99,16 @@ public class RestUser {
         return "Success";
     }
 
+    @PostMapping("/logout")
+    public String logout(@RequestHeader("Authorization") String authorizationHeader) {
+        String jwt = null;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ") && !authorizationHeader.equals("Bearer null")) {
+            jwt = authorizationHeader.substring(7);
+            return userService.logout(jwt,jwtUtil.getExpirationTime(jwt));
+        }
+        return "failLogout";
+    }
+
     @PutMapping("/forgotPassword/{username}")
     public void forgotPassword(@PathVariable String username ) {
         User user = userService.findByUsername(username);
@@ -118,6 +128,7 @@ public class RestUser {
     public User updateAddress(@RequestBody UserDTO userDTO) {
         return userProfileService.updateProfile(userDTO);
     }
+
 
 
 }

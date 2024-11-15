@@ -5,6 +5,7 @@ import com.example.mmo_shop.dao.repository.UserRepository;
 import com.example.mmo_shop.dao.model.dto.CustomUserDetails;
 import com.example.mmo_shop.dao.model.entity.Role;
 import com.example.mmo_shop.dao.model.entity.User;
+import com.example.mmo_shop.service.JwtBlacklistService;
 import com.example.mmo_shop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,14 +20,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class UserServiceImple implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+
+    @Autowired
+    private JwtBlacklistService jwtBlacklistService;
+
     @Autowired
     public UserServiceImple(UserRepository userRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
@@ -83,6 +86,12 @@ public class UserServiceImple implements UserService, UserDetailsService {
     @Override
     public void deleteByID(int id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public String logout(String jwt, long expTime) {
+        jwtBlacklistService.blacklistToken(jwt, expTime);
+        return "success";
     }
 
     @Override
