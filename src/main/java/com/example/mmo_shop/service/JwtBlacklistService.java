@@ -20,7 +20,6 @@ public class JwtBlacklistService {
     // kiểm tra jwt xem bị khóa không
     public boolean isTokenBlacklisted(String token) {
         String key = "blacklisted:" + token;
-        System.out.println(Boolean.TRUE.equals(redisTemplate.hasKey(key)));
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 }

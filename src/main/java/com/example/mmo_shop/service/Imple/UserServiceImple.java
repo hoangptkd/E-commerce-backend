@@ -1,25 +1,32 @@
 package com.example.mmo_shop.service.Imple;
 
+import com.example.mmo_shop.dao.model.entity.Cart;
+import com.example.mmo_shop.dao.model.entity.EmailMessage;
 import com.example.mmo_shop.dao.repository.RoleRepository;
 import com.example.mmo_shop.dao.repository.UserRepository;
 import com.example.mmo_shop.dao.model.dto.CustomUserDetails;
 import com.example.mmo_shop.dao.model.entity.Role;
 import com.example.mmo_shop.dao.model.entity.User;
 import com.example.mmo_shop.service.JwtBlacklistService;
+import com.example.mmo_shop.service.JwtUtil;
 import com.example.mmo_shop.service.UserService;
+import com.example.mmo_shop.service.mail.KafkaProducer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.Set;
+import java.time.Duration;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class UserServiceImple implements UserService, UserDetailsService {
@@ -29,7 +36,13 @@ public class UserServiceImple implements UserService, UserDetailsService {
 
     @Autowired
     private JwtBlacklistService jwtBlacklistService;
-
+    @Autowired
+    private KafkaProducer kafkaProducer;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+    @Autowired
+    private JwtUtil jwtUtil;
+    private final Random random = new Random();
     @Autowired
     public UserServiceImple(UserRepository userRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
@@ -66,7 +79,24 @@ public class UserServiceImple implements UserService, UserDetailsService {
     public User findByGmail(String gmail) {return userRepository.findByGmail(gmail);}
     @Transactional
     @Override
-    public void createUser(User user, Set<Role> roleSet) {
+    public String createUser(User user) {
+        if (findByUsername(user.getUsername()) != null) {
+            return "ErrorUsername";
+        }
+        if (findByGmail(user.getGmail()) != null) {
+            return "ErrorGmail";
+        }
+        if (!isValidEmail(user.getGmail())) {
+            return "ErrorValidateGmail";
+        }
+        if (user.getBalance() == 0) {
+            user.setBalance(0); // Giá trị mặc định
+        }
+        Date date = new Date();
+        user.setRegister_date(date);
+        user.setCart(new Cart());
+        Set<Role> roleSet = new HashSet<>();
+        roleSet.add(new Role(user,"ROLE_CUSTOMER"));
         for (Role role: roleSet) {
             user.setPassword("{noop}" + user.getPassword());
 
@@ -74,8 +104,19 @@ public class UserServiceImple implements UserService, UserDetailsService {
             // Cập nhật username trong bảng authorities
             roleRepository.save(role);
         }
+        return "success";
     }
+    public static boolean isValidEmail(String email) {
+        // Biểu thức chính quy để xác thực định dạng email
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@gmail\\.com$";
 
+        Pattern pattern = Pattern.compile(emailRegex);
+        if (email == null) {
+            return false;
+        }
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
 
     @Override
     public User updateUser(User user) {
@@ -92,6 +133,31 @@ public class UserServiceImple implements UserService, UserDetailsService {
     public String logout(String jwt, long expTime) {
         jwtBlacklistService.blacklistToken(jwt, expTime);
         return "success";
+    }
+
+    @Override
+    public String createCode(String username) {
+        User user = findByUsername(username);
+        if (user == null) {
+            return "noUser";
+        }
+        int code = 100000 + random.nextInt(900000);
+        EmailMessage emailMessage = new EmailMessage(user.getGmail(),"Code", "Ma xac thuc: " + code);
+        kafkaProducer.sendMessage("send_email", emailMessage);
+        String key = "validCode:" + username +"|"+ code;
+        long ttl = 5 * 60 * 1000;
+        redisTemplate.opsForValue().set(key, "1", Duration.ofMillis(ttl));
+        return "success";
+    }
+
+    @Override
+    public String confirmCode(String username, int code) {
+        if (Boolean.TRUE.equals(redisTemplate.hasKey("validCode:" + username + "|" + code))) {
+            redisTemplate.delete("validCode:" + username + "|" + code);
+            return jwtUtil.generateToken(username);
+        } else {
+            return "fail";
+        }
     }
 
     @Override

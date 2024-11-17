@@ -1,12 +1,10 @@
 package com.example.mmo_shop.service;
 
-import com.example.mmo_shop.dao.model.entity.Address;
-import com.example.mmo_shop.dao.model.entity.Role;
+
 import com.example.mmo_shop.dao.model.entity.User;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-import java.util.Set;
+
 
 public interface UserService {
     Page<User> findAll(int page, int size, String sortBy, String sortDir);
@@ -15,10 +13,13 @@ public interface UserService {
 
     User findByGmail(String gmail);
 
-    void createUser(User user, Set<Role> roleSet);
+    String createUser(User user);
     User updateUser(User user);
     void deleteByID(int id);
 
 
     String logout(String jwt, long expTime);
+
+    String createCode(String username);
+    String confirmCode(String username, int code);
 }

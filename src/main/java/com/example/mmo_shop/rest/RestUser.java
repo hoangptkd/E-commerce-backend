@@ -2,19 +2,18 @@ package com.example.mmo_shop.rest;
 
 import com.example.mmo_shop.dao.model.dto.DtoMapper;
 import com.example.mmo_shop.dao.model.dto.UserDTO;
-import com.example.mmo_shop.dao.model.entity.Address;
-import com.example.mmo_shop.dao.model.entity.Cart;
-import com.example.mmo_shop.dao.model.entity.Role;
-import com.example.mmo_shop.dao.model.entity.User;
+import com.example.mmo_shop.dao.model.entity.*;
 import com.example.mmo_shop.service.Imple.UserProfileService;
 import com.example.mmo_shop.service.JwtUtil;
 import com.example.mmo_shop.dao.model.dto.AuthRequest;
 import com.example.mmo_shop.service.SecurityService;
 import com.example.mmo_shop.service.UserService;
+import com.example.mmo_shop.service.mail.KafkaProducer;
 import io.jsonwebtoken.Header;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/api/user")
@@ -55,7 +55,6 @@ public class RestUser {
 
     @PostMapping("/login")
     public String login(@RequestBody AuthRequest authRequest) {
-
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
@@ -65,38 +64,11 @@ public class RestUser {
             return "Login failed: " + e.getMessage();
         }
     }
-    public static boolean isValidEmail(String email) {
-        // Biểu thức chính quy để xác thực định dạng email
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@gmail\\.com$";
 
-        Pattern pattern = Pattern.compile(emailRegex);
-        if (email == null) {
-            return false;
-        }
-        Matcher matcher = pattern.matcher(email);
-        return matcher.matches();
-    }
     @PostMapping("/signup")
     public String register(@RequestBody User user) {
-        if (userService.findByUsername(user.getUsername()) != null) {
-            return "ErrorUsername";
-        }
-        if (userService.findByGmail(user.getGmail()) != null) {
-            return "ErrorGmail";
-        }
-        if (!isValidEmail(user.getGmail())) {
-            return "ErrorValidateGmail";
-        }
-        if (user.getBalance() == 0) {
-            user.setBalance(0); // Giá trị mặc định
-        }
-        Date date = new Date();
-        user.setRegister_date(date);
-        user.setCart(new Cart());
-        Set<Role> roleSet = new HashSet<>();
-        roleSet.add(new Role(user,"ROLE_CUSTOMER"));
-        userService.createUser(user, roleSet);
-        return "Success";
+        return userService.createUser(user);
+
     }
 
     @PostMapping("/logout")
@@ -109,22 +81,32 @@ public class RestUser {
         return "failLogout";
     }
 
-    @PutMapping("/forgotPassword/{username}")
-    public void forgotPassword(@PathVariable String username ) {
-        User user = userService.findByUsername(username);
-
+    @PostMapping("/forgotPassword/{username}")
+    public String forgotPassword(@PathVariable String username ) {
+        return userService.createCode(username);
+    }
+    @PostMapping("/forgotPassword/confirmCode/{username}")
+    public String confirmCode(@PathVariable String username, @RequestParam int code) {
+        return userService.confirmCode(username,code);
+    }
+    @PutMapping("/changeNewPassword")
+    public void newPassword(@RequestParam String newPass ) {
+        userProfileService.changePass(newPass);
     }
     @PutMapping("/changePassword")
     public void forgotPassword(@RequestParam String currentPass, @RequestParam String newPass ) {
         userProfileService.changePass(currentPass,newPass);
     }
+
     @GetMapping("/getMainAddress")
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
     public Address getAddress() {
         return userProfileService.getAddress();
     }
 
     @Transactional
     @PutMapping("/updateProfile")
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
     public User updateAddress(@RequestBody UserDTO userDTO) {
         return userProfileService.updateProfile(userDTO);
     }

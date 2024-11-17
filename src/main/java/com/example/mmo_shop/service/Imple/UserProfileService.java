@@ -3,20 +3,15 @@ package com.example.mmo_shop.service.Imple;
 import com.example.mmo_shop.dao.model.dto.UserDTO;
 import com.example.mmo_shop.dao.model.entity.Address;
 import com.example.mmo_shop.dao.model.entity.User;
-import com.example.mmo_shop.dao.repository.AddressRepository;
 import com.example.mmo_shop.dao.repository.UserRepository;
 import com.example.mmo_shop.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class UserProfileService {
-    
-    
-    @Autowired
-    private AddressRepository addressRepository;
+
     @Autowired
     private UserRepository userRepository;
     public User changePass(String currentPass, String newPass) {
@@ -35,6 +30,15 @@ public class UserProfileService {
         return userRepository.save(user);
     }
 
+    public void changePass(String newPass) {
+        User user = SecurityService.getAuth();
+
+        // Đặt mật khẩu mới với {noop}
+        user.setPassword("{noop}" + newPass);
+
+        // Lưu vào database
+        userRepository.save(user);
+    }
     public Address getAddress() {
         User user = SecurityService.getAuth();
         return user != null ? user.getAddress() : null;
