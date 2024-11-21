@@ -2,8 +2,6 @@ package com.example.mmo_shop.dao.model.dto;
 
 import com.example.mmo_shop.dao.model.entity.ProductVersion;
 
-import java.sql.Timestamp;
-
 public class CartItemDTO {
     private int id;
     private String productName;

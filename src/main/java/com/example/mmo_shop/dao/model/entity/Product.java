@@ -1,14 +1,11 @@
 package com.example.mmo_shop.dao.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,6 +43,7 @@ public class Product {
     @Column(name = "all_stock")
     private int allStock;
     private int status;
+
     public Product() {
     }
 

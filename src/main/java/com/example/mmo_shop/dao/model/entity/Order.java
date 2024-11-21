@@ -3,13 +3,9 @@ package com.example.mmo_shop.dao.model.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -24,7 +20,7 @@ public class Order {
 
     @ManyToOne()
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @JsonIgnoreProperties({"orders","cart","shop","address"})
+    @JsonIgnoreProperties({"orders", "cart", "shop", "address"})
     private User user;
     @Column(name = "order_date")
     @CreationTimestamp
@@ -115,7 +111,7 @@ public class Order {
     }
 
     public String getShippingAddress() {
-                                                            return shippingAddress;
+        return shippingAddress;
     }
 
     public void setShippingAddress(Address shippingAddressEntity) {

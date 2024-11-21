@@ -1,7 +1,5 @@
 package com.example.mmo_shop.dao.model.entity;
 
-import java.util.List;
-
 public class EmailMessage {
     private String recipient;
     private String subject;

@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ProductVersionRepository extends JpaRepository<ProductVersion,Integer> {
+public interface ProductVersionRepository extends JpaRepository<ProductVersion, Integer> {
     List<ProductVersion> getProductVersionsByProduct(Product product);
 }

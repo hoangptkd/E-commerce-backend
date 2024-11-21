@@ -1,10 +1,7 @@
 package com.example.mmo_shop.dao.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "product_versions")
@@ -23,6 +20,7 @@ public class ProductVersion {
     private double price;
     private Integer stock;
     private int status;
+
     public int getId() {
         return id;
     }
@@ -30,6 +28,7 @@ public class ProductVersion {
     public void setId(int id) {
         this.id = id;
     }
+
     public void setProduct(Product product) {
         this.product = product;
     }
@@ -53,7 +52,6 @@ public class ProductVersion {
     public void setPrice(double price) {
         this.price = price;
     }
-
 
 
     public Integer getStock() {

@@ -40,33 +40,34 @@ public class ProductServiceImple implements ProductService {
 
         return categoryRepository.findAll();
     }
+
     @Override
     public List<Category> getSpecialCategories() {
-        Pageable pageable = PageRequest.of(0,4);
+        Pageable pageable = PageRequest.of(0, 4);
         return categoryRepository.findTopCategoriesSortedByProductCount(pageable);
     }
 
     @Override
     public Set<Category> getCategoriesBySearch(String name) {
         List<Product> productsBySearch = productRepository.findByNameContainingIgnoreCase(name);
-        Map<Category,List<Product>> categoryMap = productsBySearch.stream().filter(product -> product.getCategory() != null).collect(Collectors.groupingBy(
-             Product::getCategory,
-            LinkedHashMap::new,
-            Collectors.toList()
+        Map<Category, List<Product>> categoryMap = productsBySearch.stream().filter(product -> product.getCategory() != null).collect(Collectors.groupingBy(
+                Product::getCategory,
+                LinkedHashMap::new,
+                Collectors.toList()
         ));
 
         return categoryMap.keySet();
     }
 
     @Override
-    public Page<Product> findAllByPage(int page, int size,String sortBy, String sortDir) {
+    public Page<Product> findAllByPage(int page, int size, String sortBy, String sortDir) {
         Pageable pageable;
 
         if (sortBy != null && !sortBy.isEmpty()) {
             Sort sort = sortDir.equalsIgnoreCase("asc")
                     ? Sort.by(sortBy).ascending()
                     : Sort.by(sortBy).descending();
-            pageable = PageRequest.of(page, size,sort);
+            pageable = PageRequest.of(page, size, sort);
         } else {
             pageable = PageRequest.of(page, size);
         }
@@ -76,27 +77,30 @@ public class ProductServiceImple implements ProductService {
 
     @Override
     public List<Product> findByCategory(int categoryId) {
-        Category category =categoryRepository.findById(categoryId).orElse(null);
+        Category category = categoryRepository.findById(categoryId).orElse(null);
         return productRepository.findByCategory(category);
     }
+
     @Override
-    public Page<Product> findSpecialProduct(int page, int size,String sortBy, int categoryId) {
-        Category category =categoryRepository.findById(categoryId).orElse(null);
+    public Page<Product> findSpecialProduct(int page, int size, String sortBy, int categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElse(null);
         Sort sort = Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page,size,sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         if (category == null) {
-            return productRepository.findByStatus(1,pageable);
+            return productRepository.findByStatus(1, pageable);
         } else {
-            return productRepository.findByCategoryAndStatus(category,1,pageable);
+            return productRepository.findByCategoryAndStatus(category, 1, pageable);
         }
     }
+
     @Override
     public Page<Product> findNewProduct(int page, int size, String sortBy) {
         Sort sort = Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page,size,sort);
-        return productRepository.findByStatus(1,pageable);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return productRepository.findByStatus(1, pageable);
 
     }
+
     @Override
     public List<Product> findByShop(int shopId) {
         Shop shop = shopRepository.findById(shopId).orElse(null);
@@ -112,18 +116,20 @@ public class ProductServiceImple implements ProductService {
         }
         return product.orElse(null);
     }
+
     @Override
     public List<Product> findSimilarProducts(int categoryId, int productId) {
         return productRepository.findSimilarProducts(categoryId, productId);
     }
+
     @Override
-    public Page<Product> search(String name,int page, int size,String sortBy, String sortDir, int categoryId,int priceFrom,int priceTo) {
+    public Page<Product> search(String name, int page, int size, String sortBy, String sortDir, int categoryId, int priceFrom, int priceTo) {
         Pageable pageable;
         if (sortBy != null && !sortBy.isEmpty()) {
             Sort sort = sortDir.equalsIgnoreCase("asc")
                     ? Sort.by(sortBy).ascending()
                     : Sort.by(sortBy).descending();
-            pageable = PageRequest.of(page, size,sort);
+            pageable = PageRequest.of(page, size, sort);
         } else {
             pageable = PageRequest.of(page, size);
         }
@@ -140,7 +146,7 @@ public class ProductServiceImple implements ProductService {
             spec = spec.and(ProductSpecification.hasPriceBetween(priceFrom, priceTo));
         }
         spec = spec.and(ProductSpecification.hasStatus(1));
-        return productRepository.findAll(spec,pageable);
+        return productRepository.findAll(spec, pageable);
     }
 
     @Transactional
@@ -150,13 +156,14 @@ public class ProductServiceImple implements ProductService {
         Shop shop = user.getShop();
         product.setShop(shop);
         List<ProductVersion> changeProductVersions = product.getVersions();
-        for (ProductVersion productVersion: changeProductVersions) {
+        for (ProductVersion productVersion : changeProductVersions) {
             productVersion.setStatus(1);
             productVersion.setProduct(product);
         }
         productRepository.save(product);
         return product;
     }
+
     @Transactional
     @Override
     public Product update(Product product) {
@@ -168,7 +175,7 @@ public class ProductServiceImple implements ProductService {
     }
 
     @Override
-    public void updateBuyersCount(Product product,int quantity) {
+    public void updateBuyersCount(Product product, int quantity) {
         int buyersCount = product.getBuyersCount();
         product.setBuyersCount(buyersCount + quantity);
         productRepository.save(product);
@@ -181,7 +188,6 @@ public class ProductServiceImple implements ProductService {
         save(product);
         return product;
     }
-
 
 
     @Override
@@ -205,7 +211,6 @@ public class ProductServiceImple implements ProductService {
         }
         return product;
     }
-
 
 
 }

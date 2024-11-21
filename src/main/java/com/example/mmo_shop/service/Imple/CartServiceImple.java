@@ -1,7 +1,10 @@
 package com.example.mmo_shop.service.Imple;
 
 
-import com.example.mmo_shop.dao.model.entity.*;
+import com.example.mmo_shop.dao.model.entity.Cart;
+import com.example.mmo_shop.dao.model.entity.CartItem;
+import com.example.mmo_shop.dao.model.entity.Shop;
+import com.example.mmo_shop.dao.model.entity.User;
 import com.example.mmo_shop.dao.repository.CartItemRepository;
 import com.example.mmo_shop.dao.repository.CartRepository;
 import com.example.mmo_shop.service.CartService;
@@ -9,13 +12,17 @@ import com.example.mmo_shop.service.SecurityService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class CartServiceImple implements CartService {
     private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;
+
     public CartServiceImple(CartItemRepository cartItemRepository, CartRepository cartRepository) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
@@ -32,6 +39,7 @@ public class CartServiceImple implements CartService {
         }
         return cart;
     }
+
     @Override
     public Map<Shop, List<CartItem>> findByUser() {
         Cart cart = getCardFromAuthentication();
@@ -51,7 +59,7 @@ public class CartServiceImple implements CartService {
         cartItem.setCart(cart);
         Optional<CartItem> findCartItem = cart.getCartItems().stream().filter(cartItem1 -> cartItem1.getProductVersion().getId() == cartItem.getProductVersion().getId()).findFirst();
         if (findCartItem.isPresent()) {
-            findCartItem.get().setQuantity(findCartItem.get().getQuantity()+cartItem.getQuantity());
+            findCartItem.get().setQuantity(findCartItem.get().getQuantity() + cartItem.getQuantity());
             return cartItemRepository.save(findCartItem.get());
         }
 
@@ -62,9 +70,9 @@ public class CartServiceImple implements CartService {
     public CartItem updateQuantity(int id, int quantity) {
         Map<Shop, List<CartItem>> groupCartItem = findByUser();
         CartItem updateCartItem = null;
-        for (Map.Entry<Shop,List<CartItem>> shopMap : groupCartItem.entrySet()){
+        for (Map.Entry<Shop, List<CartItem>> shopMap : groupCartItem.entrySet()) {
             List<CartItem> cartItems = shopMap.getValue();
-            for (CartItem item:cartItems) {
+            for (CartItem item : cartItems) {
                 if (item.getId() == id) {
                     updateCartItem = item;
                     break;

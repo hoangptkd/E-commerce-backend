@@ -1,6 +1,5 @@
 package com.example.mmo_shop.dao.model.entity;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -16,7 +15,7 @@ public class User {
     private String gmail;
     @Column(name = "full_name")
     private String name;
-    private String username,password;
+    private String username, password;
     private String phone;
     private long balance = 0;
     private Date register_date;
@@ -25,7 +24,7 @@ public class User {
     @JsonManagedReference
     private Set<Role> roles = new HashSet<>();
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cart_id",referencedColumnName = "id")
+    @JoinColumn(name = "cart_id", referencedColumnName = "id")
     @JsonManagedReference
     private Cart cart;
 
@@ -38,12 +37,13 @@ public class User {
     private Shop shop;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties({"user","orderItems"})
+    @JsonIgnoreProperties({"user", "orderItems"})
     private List<Order> orders = new ArrayList<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference(value = "user_address")
     private Address address;
+
     public User() {
     }
 

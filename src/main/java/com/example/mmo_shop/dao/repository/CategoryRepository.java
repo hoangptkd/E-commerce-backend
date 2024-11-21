@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category,Integer> {
+public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("Select c from Category c left join c.products p group by c order by count(p) desc")
     List<Category> findTopCategoriesSortedByProductCount(Pageable pageable);
 }

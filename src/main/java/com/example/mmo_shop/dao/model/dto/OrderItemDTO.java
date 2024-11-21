@@ -1,12 +1,5 @@
 package com.example.mmo_shop.dao.model.dto;
 
-import com.example.mmo_shop.dao.model.entity.Order;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-
-import java.math.BigDecimal;
-
 public class OrderItemDTO {
     private int id;
     private String versionName;

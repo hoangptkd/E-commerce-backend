@@ -14,6 +14,7 @@ public class UserProfileService {
 
     @Autowired
     private UserRepository userRepository;
+
     public User changePass(String currentPass, String newPass) {
         User user = SecurityService.getAuth();
 
@@ -39,12 +40,13 @@ public class UserProfileService {
         // Lưu vào database
         userRepository.save(user);
     }
+
     public Address getAddress() {
         User user = SecurityService.getAuth();
         return user != null ? user.getAddress() : null;
     }
-    
-    public User updateProfile(UserDTO userDTO){
+
+    public User updateProfile(UserDTO userDTO) {
         User user = SecurityService.getAuth();
         if (!user.getName().equalsIgnoreCase(userDTO.getName())) {
             user.setName(userDTO.getName());
@@ -52,7 +54,7 @@ public class UserProfileService {
         if (user.getPhone() == null) {
             user.setPhone(userDTO.getPhone());
         } else {
-            if (!user.getPhone().equalsIgnoreCase(userDTO.getPhone())){
+            if (!user.getPhone().equalsIgnoreCase(userDTO.getPhone())) {
                 user.setPhone(userDTO.getPhone());
             }
         }

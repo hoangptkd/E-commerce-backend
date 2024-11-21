@@ -1,7 +1,6 @@
 package com.example.mmo_shop.service;
 
 import com.example.mmo_shop.dao.model.dto.CustomUserDetails;
-import com.example.mmo_shop.dao.model.entity.Role;
 import com.example.mmo_shop.dao.model.entity.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,8 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional

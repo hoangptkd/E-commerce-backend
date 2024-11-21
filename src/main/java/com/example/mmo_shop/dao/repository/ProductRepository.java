@@ -5,7 +5,6 @@ import com.example.mmo_shop.dao.model.entity.Product;
 import com.example.mmo_shop.dao.model.entity.Shop;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product,Integer>, JpaSpecificationExecutor<Product> {
+public interface ProductRepository extends JpaRepository<Product, Integer>, JpaSpecificationExecutor<Product> {
 
     List<Product> findByCategory(Category category);
 
@@ -23,15 +22,17 @@ public interface ProductRepository extends JpaRepository<Product,Integer>, JpaSp
 
     List<Product> findByNameContainingIgnoreCase(String name);
 
-    Page<Product> findByCategoryAndStatus(Category category,int status, Pageable pageable);
+    Page<Product> findByCategoryAndStatus(Category category, int status, Pageable pageable);
+
     Page<Product> findByStatus(int status, Pageable pageable);
+
     @Query("""
-        SELECT p FROM Product p 
-        WHERE p.category.id = :categoryId 
-        AND p.id != :productId
-        ORDER BY p.rating DESC, p.buyersCount DESC 
-        LIMIT 5
-        """)
+            SELECT p FROM Product p 
+            WHERE p.category.id = :categoryId 
+            AND p.id != :productId
+            ORDER BY p.rating DESC, p.buyersCount DESC 
+            LIMIT 5
+            """)
     List<Product> findSimilarProducts(
             @Param("categoryId") int categoryId,
             @Param("productId") int productId

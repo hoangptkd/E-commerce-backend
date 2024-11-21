@@ -27,10 +27,12 @@ public class OrderServiceImple implements OrderService {
     private OrderItemRepository orderItemRepository;
     @Autowired
     private ProductService productService;
+
     @Override
     public List<Order> findAll() {
         return orderRepository.findAll();
     }
+
     @Override
     public List<Order> findByUser() {
         User user = SecurityService.getAuth();
@@ -42,9 +44,10 @@ public class OrderServiceImple implements OrderService {
     public Page<Order> findByShop(int page) {
         User user = SecurityService.getAuth();
         Shop shop = user.getShop();
-        Pageable pageable= PageRequest.of(page,20);
-        return orderRepository.getOrdersByShop(shop,pageable);
+        Pageable pageable = PageRequest.of(page, 20);
+        return orderRepository.getOrdersByShop(shop, pageable);
     }
+
     @Override
     public OrderDTO addOrder(Order order) {
         User user = SecurityService.getAuth();
@@ -57,7 +60,7 @@ public class OrderServiceImple implements OrderService {
     }
 
     @Override
-    public Order changeStatusOrder(int orderId,DeliveryStatus status) {
+    public Order changeStatusOrder(int orderId, DeliveryStatus status) {
         User user = SecurityService.getAuth();
         Shop shop = user.getShop();
         Order order = orderRepository.getOrderById(orderId);
@@ -69,7 +72,7 @@ public class OrderServiceImple implements OrderService {
             List<OrderItem> orderItems = orderItemRepository.findAllByOrder(order);
             orderItems.forEach(orderItem -> {
                 Product product = orderItem.getProductVersion().getProduct();
-                productService.updateBuyersCount(product,orderItem.getQuantity());
+                productService.updateBuyersCount(product, orderItem.getQuantity());
             });
         }
         return orderRepository.save(order);
@@ -89,20 +92,22 @@ public class OrderServiceImple implements OrderService {
     public void deleteByID(int id) {
         orderRepository.deleteById(id);
     }
+
     @Override
     public Map<DeliveryStatus, Long> getQuantityData() {
         User user = SecurityService.getAuth();
         Shop shop = user.getShop();
-        List<Order> orderList= orderRepository.getOrdersByShop(shop);
+        List<Order> orderList = orderRepository.getOrdersByShop(shop);
         Map<DeliveryStatus, Long> quantityData = orderList.stream().collect(Collectors.groupingBy(
-            order -> (order.getStatus()),
-            Collectors.counting()
+                order -> (order.getStatus()),
+                Collectors.counting()
         ));
         return quantityData;
     }
+
     @Override
     public Map<DeliveryStatus, Long> getAllData() {
-        List<Order> orderList= orderRepository.findAll();
+        List<Order> orderList = orderRepository.findAll();
         Map<DeliveryStatus, Long> quantityData = orderList.stream().collect(Collectors.groupingBy(
                 order -> (order.getStatus()),
                 Collectors.counting()

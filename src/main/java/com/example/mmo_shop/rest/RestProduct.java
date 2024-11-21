@@ -1,21 +1,18 @@
 package com.example.mmo_shop.rest;
 
-import com.example.mmo_shop.dao.model.dto.ProductDTO;
 import com.example.mmo_shop.dao.model.dto.DtoMapper;
+import com.example.mmo_shop.dao.model.dto.ProductDTO;
 import com.example.mmo_shop.dao.model.entity.Category;
+import com.example.mmo_shop.dao.model.entity.Product;
 import com.example.mmo_shop.dao.model.entity.Shop;
 import com.example.mmo_shop.dao.model.entity.User;
-import com.example.mmo_shop.dao.repository.ShopRepository;
 import com.example.mmo_shop.service.Imple.ImageService;
 import com.example.mmo_shop.service.ProductService;
 import com.example.mmo_shop.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import com.example.mmo_shop.dao.model.entity.Product;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -28,6 +25,7 @@ public class RestProduct {
     private final ProductService productService;
 
     private final ImageService imageService;
+
     @Autowired
     public RestProduct(ProductService productService, ImageService imageService) {
         this.productService = productService;
@@ -44,14 +42,17 @@ public class RestProduct {
     public Set<Category> getCategories(@RequestParam String name) {
         return productService.getCategoriesBySearch(name);
     }
+
     @GetMapping("/getAllCategories")
     public List<Category> getAllCategories() {
         return productService.getCategories();
     }
+
     @GetMapping("/getTopCategories")
     public List<Category> getTopCategories() {
         return productService.getSpecialCategories();
     }
+
     @GetMapping("/listAll")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public Page<Product> getAllProducts(
@@ -59,26 +60,28 @@ public class RestProduct {
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false) String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
-        return productService.findAllByPage(page,size,sortBy,sortDir);
+        return productService.findAllByPage(page, size, sortBy, sortDir);
     }
 
     @GetMapping("/listSpecial")
     public Page<Product> getSpecialProduct(
-           @RequestParam(defaultValue = "0") int page,
-           @RequestParam(defaultValue = "12") int size,
-           @RequestParam(defaultValue = "buyersCount") String sortBy,
-           @RequestParam(defaultValue = "0") int categoryId
-   ) {
-        return productService.findSpecialProduct(page,size,sortBy,categoryId);
-   }
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "buyersCount") String sortBy,
+            @RequestParam(defaultValue = "0") int categoryId
+    ) {
+        return productService.findSpecialProduct(page, size, sortBy, categoryId);
+    }
+
     @GetMapping("/listNew")
     public Page<Product> getNewProduct(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "registerDate") String sortBy
     ) {
-        return productService.findNewProduct(page,size,sortBy);
+        return productService.findNewProduct(page, size, sortBy);
     }
+
     @GetMapping("/search")
     public Page<Product> getProductsBySearch(
             @RequestParam String name,
@@ -91,7 +94,7 @@ public class RestProduct {
             @RequestParam(required = false) int priceTo
     ) {
 
-       return productService.search(name,page,size,sortBy,sortDir,categoryId,priceFrom,priceTo);
+        return productService.search(name, page, size, sortBy, sortDir, categoryId, priceFrom, priceTo);
 
 
     }
@@ -127,6 +130,7 @@ public class RestProduct {
         );
 
     }
+
     @PostMapping("/add")
     @PreAuthorize("hasAnyRole('SELLER')")
     public Product addProduct(@RequestBody Product product) {
@@ -149,7 +153,7 @@ public class RestProduct {
 
     @DeleteMapping("/delete/{productId}")
     @PreAuthorize("hasAnyRole('SELLER')")
-    public Product deleteProduct(@PathVariable int productId ) {
+    public Product deleteProduct(@PathVariable int productId) {
         return productService.deleteByID(productId);
     }
 

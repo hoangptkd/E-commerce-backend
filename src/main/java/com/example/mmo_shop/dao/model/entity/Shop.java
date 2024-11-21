@@ -1,7 +1,9 @@
 package com.example.mmo_shop.dao.model.entity;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;  // Sử dụng gói `jakarta.persistence` cho JPA 3.x trở lên, hoặc `javax.persistence` cho các phiên bản cũ hơn.
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
@@ -21,7 +23,7 @@ public class Shop {
     private String description;
 
     @OneToOne
-    @JoinColumn(name = "owner_id",referencedColumnName = "id")
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
     @JsonBackReference(value = "shop_user")
     private User user;
 
@@ -48,8 +50,10 @@ public class Shop {
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference(value = "shop-order")
     private List<Order> order;
+
     // Constructor không đối số là bắt buộc cho JPA
-    public Shop() {}
+    public Shop() {
+    }
 
     // Getter và Setter cho tất cả các trường dữ liệu
     public int getId() {

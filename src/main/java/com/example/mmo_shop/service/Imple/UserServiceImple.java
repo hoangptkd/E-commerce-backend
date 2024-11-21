@@ -1,12 +1,12 @@
 package com.example.mmo_shop.service.Imple;
 
+import com.example.mmo_shop.dao.model.dto.CustomUserDetails;
 import com.example.mmo_shop.dao.model.entity.Cart;
 import com.example.mmo_shop.dao.model.entity.EmailMessage;
-import com.example.mmo_shop.dao.repository.RoleRepository;
-import com.example.mmo_shop.dao.repository.UserRepository;
-import com.example.mmo_shop.dao.model.dto.CustomUserDetails;
 import com.example.mmo_shop.dao.model.entity.Role;
 import com.example.mmo_shop.dao.model.entity.User;
+import com.example.mmo_shop.dao.repository.RoleRepository;
+import com.example.mmo_shop.dao.repository.UserRepository;
 import com.example.mmo_shop.service.JwtBlacklistService;
 import com.example.mmo_shop.service.JwtUtil;
 import com.example.mmo_shop.service.UserService;
@@ -45,6 +45,7 @@ public class UserServiceImple implements UserService, UserDetailsService {
     @Autowired
     private JwtUtil jwtUtil;
     private final Random random = new Random();
+
     @Autowired
     public UserServiceImple(UserRepository userRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
@@ -58,7 +59,7 @@ public class UserServiceImple implements UserService, UserDetailsService {
             Sort sort = sortDir.equalsIgnoreCase("asc")
                     ? Sort.by(sortBy).ascending()
                     : Sort.by(sortBy).descending();
-            pageable = PageRequest.of(page, size,sort);
+            pageable = PageRequest.of(page, size, sort);
         } else {
             pageable = PageRequest.of(page, size);
         }
@@ -78,7 +79,10 @@ public class UserServiceImple implements UserService, UserDetailsService {
     }
 
     @Override
-    public User findByGmail(String gmail) {return userRepository.findByGmail(gmail);}
+    public User findByGmail(String gmail) {
+        return userRepository.findByGmail(gmail);
+    }
+
     @Transactional
     @Override
     public String createUser(User user) {
@@ -99,8 +103,8 @@ public class UserServiceImple implements UserService, UserDetailsService {
         user.setRegister_date(date);
         user.setCart(new Cart());
         Set<Role> roleSet = new HashSet<>();
-        roleSet.add(new Role(user,"ROLE_CUSTOMER"));
-        for (Role role: roleSet) {
+        roleSet.add(new Role(user, "ROLE_CUSTOMER"));
+        for (Role role : roleSet) {
 
             userRepository.save(user);
             // Cập nhật username trong bảng authorities
@@ -108,6 +112,7 @@ public class UserServiceImple implements UserService, UserDetailsService {
         }
         return "Success";
     }
+
     public static boolean isValidEmail(String email) {
         // Biểu thức chính quy để xác thực định dạng email
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@gmail\\.com$";
@@ -144,9 +149,9 @@ public class UserServiceImple implements UserService, UserDetailsService {
             return "noUser";
         }
         int code = 100000 + random.nextInt(900000);
-        EmailMessage emailMessage = new EmailMessage(user.getGmail(),"Code", "Ma xac thuc: " + code);
+        EmailMessage emailMessage = new EmailMessage(user.getGmail(), "Code", "Ma xac thuc: " + code);
         kafkaProducer.sendMessage("send_email", emailMessage);
-        String key = "validCode:" + username +"|"+ code;
+        String key = "validCode:" + username + "|" + code;
         long ttl = 5 * 60 * 1000;
         redisTemplate.opsForValue().set(key, "1", Duration.ofMillis(ttl));
         return "success";

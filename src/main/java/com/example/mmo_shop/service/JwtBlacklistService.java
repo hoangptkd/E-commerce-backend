@@ -12,11 +12,13 @@ public class JwtBlacklistService {
     public JwtBlacklistService(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
+
     public void blacklistToken(String token, long expTime) {
-        String key =  "blacklisted:" + token;
+        String key = "blacklisted:" + token;
         long ttl = expTime - System.currentTimeMillis();
         redisTemplate.opsForValue().set(key, "1", Duration.ofMillis(ttl));
     }
+
     // kiểm tra jwt xem bị khóa không
     public boolean isTokenBlacklisted(String token) {
         String key = "blacklisted:" + token;

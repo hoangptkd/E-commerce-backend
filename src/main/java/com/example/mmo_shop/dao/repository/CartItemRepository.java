@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 
-public interface CartItemRepository extends JpaRepository<CartItem,Integer> {
+public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     @Modifying
     @Transactional
     @Query("DELETE FROM CartItem c WHERE c.id = ?1")

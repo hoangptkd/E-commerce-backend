@@ -8,13 +8,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 @SpringBootTest
 class RedisConfigTest {
-        @Autowired
-        private RedisTemplate<String, Object> redisTemplate;
-        @Test
-        void redisTestCode() {
-            String key = "validCode:123456";
-            long ttl = 5 * 60 * 1000;
-            redisTemplate.opsForValue().set(key, "1", ttl);
-        }
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Test
+    void redisTestCode() {
+        String key = "validCode:123456";
+        long ttl = 5 * 60 * 1000;
+        redisTemplate.opsForValue().set(key, "1", ttl);
+    }
 
 }

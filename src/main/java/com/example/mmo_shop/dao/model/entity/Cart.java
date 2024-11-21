@@ -6,9 +6,7 @@ import jakarta.persistence.*;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "shopping_cart")
@@ -21,9 +19,10 @@ public class Cart {
     @OneToOne(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonBackReference
     private User user;
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference(value = "cart-item")
     private List<CartItem> cartItems = new ArrayList<>();
+
     public Cart() {
     }
 

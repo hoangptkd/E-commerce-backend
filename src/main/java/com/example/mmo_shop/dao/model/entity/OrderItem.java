@@ -2,7 +2,6 @@ package com.example.mmo_shop.dao.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "order_items")

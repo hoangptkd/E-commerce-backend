@@ -11,10 +11,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order,Integer> {
+public interface OrderRepository extends JpaRepository<Order, Integer> {
     Page<Order> getOrdersByShop(Shop shop, Pageable pageable);
-    
+
     List<Order> getOrdersByShop(Shop shop);
+
     List<Order> findAllByUser(User user);
 
     Order getOrderById(int id);

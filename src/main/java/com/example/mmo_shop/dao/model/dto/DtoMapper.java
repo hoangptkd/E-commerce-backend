@@ -5,7 +5,7 @@ import com.example.mmo_shop.dao.model.entity.*;
 import java.util.List;
 
 public class DtoMapper {
-    public static ProductDTO toDto(Product product){
+    public static ProductDTO toDto(Product product) {
         ProductDTO productDTO = new ProductDTO();
         productDTO.setId(product.getId());
         productDTO.setName(product.getName());
@@ -22,7 +22,8 @@ public class DtoMapper {
         );
         return productDTO;
     }
-    public static CartItemDTO toCartItemDto(CartItem cartItem){
+
+    public static CartItemDTO toCartItemDto(CartItem cartItem) {
         CartItemDTO cartItemDTO = new CartItemDTO();
         cartItemDTO.setId(cartItem.getId());
         cartItemDTO.setProductName(cartItem.getProductVersion().getProduct().getName());
@@ -32,6 +33,7 @@ public class DtoMapper {
         cartItemDTO.setQuantity(cartItem.getQuantity());
         return cartItemDTO;
     }
+
     public static ShopCartDTO toShopCartDTO(Shop shop, List<CartItemDTO> cartItemDTOS) {
         ShopCartDTO shopCartDTO = new ShopCartDTO();
         shopCartDTO.setShopId(shop.getId());
@@ -41,8 +43,7 @@ public class DtoMapper {
     }
 
 
-
-    private static OrderItemDTO toOrderItemDto(OrderItem orderItem){
+    private static OrderItemDTO toOrderItemDto(OrderItem orderItem) {
         OrderItemDTO orderItemDTO = new OrderItemDTO();
         orderItemDTO.setId(orderItem.getId());
         orderItemDTO.setVersionName(orderItem.getProductVersion().getVersionName());
@@ -51,14 +52,14 @@ public class DtoMapper {
         return orderItemDTO;
     }
 
-    public static OrderDTO toOrderDto(Order order){
+    public static OrderDTO toOrderDto(Order order) {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setId(order.getId());
         orderDTO.setUsername(order.getUser().getUsername());
         orderDTO.setStatus(order.getStatus());
         orderDTO.setOrderDate(order.getOrderDate());
         orderDTO.setOrderItems(
-            order.getOrderItems().stream().map(DtoMapper::toOrderItemDto).toList()
+                order.getOrderItems().stream().map(DtoMapper::toOrderItemDto).toList()
         );
         orderDTO.setTotal(order.getTotal());
         orderDTO.setShippingAddress(order.getShippingAddress());

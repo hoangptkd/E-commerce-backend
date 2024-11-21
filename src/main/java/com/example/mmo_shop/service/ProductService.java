@@ -16,17 +16,19 @@ public interface ProductService {
     Set<Category> getCategoriesBySearch(String name);
 
     Page<Product> findAllByPage(int page, int size, String sortBy, String sortDir);
+
     List<Product> findByCategory(int categoryId);
 
     Page<Product> findNewProduct(int page, int size, String sortBy);
 
     List<Product> findByShop(int shopId);
+
     Product findByID(int id);
 
 
     List<Product> findSimilarProducts(int categoryId, int productId);
 
-    Page<Product> search(String name, int page, int size, String sortBy, String sortDir,int categoryId,int priceFrom,int priceTo);
+    Page<Product> search(String name, int page, int size, String sortBy, String sortDir, int categoryId, int priceFrom, int priceTo);
 
 
     Product save(Product product);
@@ -36,9 +38,9 @@ public interface ProductService {
 
     Product deleteByID(int id);
 
-    Page<Product> findSpecialProduct(int page, int size, String sortBy,int categoryId);
+    Page<Product> findSpecialProduct(int page, int size, String sortBy, int categoryId);
 
     Product update(Product product);
 
-    void updateBuyersCount(Product product,int quantity);
+    void updateBuyersCount(Product product, int quantity);
 }

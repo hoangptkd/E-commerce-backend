@@ -2,12 +2,7 @@ package com.example.mmo_shop.dao.model.dto;
 
 import com.example.mmo_shop.dao.model.entity.Address;
 import com.example.mmo_shop.dao.model.entity.DeliveryStatus;
-import com.example.mmo_shop.dao.model.entity.Order;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 

@@ -1,7 +1,6 @@
 package com.example.mmo_shop.dao.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -13,13 +12,12 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @OneToOne()
-    @JoinColumn(name = "user_id",referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonBackReference(value = "user_address")
     private User user;
     private String street;
     private String district;
     private String city;
-
 
 
     public enum CityEnum {

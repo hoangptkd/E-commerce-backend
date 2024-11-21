@@ -11,6 +11,7 @@ public class ProductDTO {
     private double rating;
     private int buyersCount;
     private List<String> versionsName;
+
     public int getId() {
         return id;
     }
@@ -66,8 +67,10 @@ public class ProductDTO {
     public void setRating(double rating) {
         this.rating = rating;
     }
+
     public void setVersionsName(List<String> versionsName) {
     }
+
     public List<String> getVersionsName(List<String> list) {
         return versionsName;
     }

@@ -2,17 +2,17 @@ package com.example.mmo_shop.rest;
 
 import com.example.mmo_shop.dao.model.dto.OrderDTO;
 import com.example.mmo_shop.dao.model.entity.*;
-import com.example.mmo_shop.dao.repository.OrderItemRepository;
 import com.example.mmo_shop.dao.repository.ProductVersionRepository;
 import com.example.mmo_shop.service.OrderService;
-import com.example.mmo_shop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -22,6 +22,7 @@ public class RestOrder {
     private OrderService orderService;
     @Autowired
     private ProductVersionRepository productVersionRepository;
+
     @PostMapping("/create")
     @Transactional
     public List<OrderDTO> createOrder(@RequestBody List<OrderItem> orderItems) {
@@ -33,7 +34,7 @@ public class RestOrder {
                     return productVersion.getProduct().getShop();
                 }
         ));
-        for (Map.Entry<Shop,List<OrderItem>> shopMap : groupOrderItem.entrySet()) {
+        for (Map.Entry<Shop, List<OrderItem>> shopMap : groupOrderItem.entrySet()) {
             Order order = new Order(shopMap.getKey());
             order.setOrderItems(new ArrayList<>());
             List<OrderItem> orderItemList = shopMap.getValue();
@@ -50,6 +51,7 @@ public class RestOrder {
         }
         return orderDTOList;
     }
+
     @GetMapping("/allOrderFromUser")
     public List<Order> findAllOrderFromUser() {
         return orderService.findByUser();
@@ -65,17 +67,20 @@ public class RestOrder {
         }
         return null;
     }
+
     @GetMapping("/allOrder")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public List<Order> findAllOrder() {
         return orderService.findAll();
     }
+
     @GetMapping("/allOrderByShop")
     public Page<Order> findAllOrderByShop(@RequestParam int page) {
         return orderService.findByShop(page);
     }
+
     @PutMapping("/editOrder/{status}")
-    public void editOrder(@PathVariable String status,@RequestParam int orderId) {
+    public void editOrder(@PathVariable String status, @RequestParam int orderId) {
         DeliveryStatus deliveryStatus;
         switch (status) {
             case "confirmed":
@@ -100,6 +105,7 @@ public class RestOrder {
     public Map<DeliveryStatus, Long> getData() {
         return orderService.getQuantityData();
     }
+
     @GetMapping("/getAllData")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public Map<DeliveryStatus, Long> getAllData() {

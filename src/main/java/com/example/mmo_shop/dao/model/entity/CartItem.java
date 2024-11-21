@@ -2,26 +2,25 @@ package com.example.mmo_shop.dao.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
 @Table(name = "shopping_cart_items")
-public class CartItem{
+public class CartItem {
     @Id
     @Column(name = "cart_item_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @ManyToOne()
-    @JoinColumn(name = "cart_id",referencedColumnName = "id")
+    @JoinColumn(name = "cart_id", referencedColumnName = "id")
     @JsonBackReference(value = "cart-item")
     private Cart cart;
     @ManyToOne()
     @JoinColumn(name = "ProductVersion_id", referencedColumnName = "id")
     private ProductVersion productVersion;
     private int quantity;
+
     public CartItem() {
     }
 
@@ -53,7 +52,7 @@ public class CartItem{
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
-    
+
 
     @Override
     public boolean equals(Object o) {
