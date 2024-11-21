@@ -20,6 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +34,8 @@ public class UserServiceImple implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtBlacklistService jwtBlacklistService;
     @Autowired
@@ -89,8 +91,9 @@ public class UserServiceImple implements UserService, UserDetailsService {
         if (!isValidEmail(user.getGmail())) {
             return "ErrorValidateGmail";
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         if (user.getBalance() == 0) {
-            user.setBalance(0); // Giá trị mặc định
+            user.setBalance(0);
         }
         Date date = new Date();
         user.setRegister_date(date);
@@ -98,13 +101,12 @@ public class UserServiceImple implements UserService, UserDetailsService {
         Set<Role> roleSet = new HashSet<>();
         roleSet.add(new Role(user,"ROLE_CUSTOMER"));
         for (Role role: roleSet) {
-            user.setPassword("{noop}" + user.getPassword());
 
             userRepository.save(user);
             // Cập nhật username trong bảng authorities
             roleRepository.save(role);
         }
-        return "success";
+        return "Success";
     }
     public static boolean isValidEmail(String email) {
         // Biểu thức chính quy để xác thực định dạng email
@@ -163,6 +165,7 @@ public class UserServiceImple implements UserService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
+
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }
