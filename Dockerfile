@@ -5,11 +5,9 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the backend source code
-COPY . .
+COPY target/Backend-0.0.1-SNAPSHOT.jar app.jar
 
-# Install dependencies and build the application
-RUN ./mvnw clean package -DskipTests
-
+COPY src/main/resources/application.properties /app/resources/
 # Expose the backend port
 EXPOSE 9090
 
