@@ -1,6 +1,5 @@
 package com.example.mmo_shop.security;
 
-import com.example.mmo_shop.service.JwtBlacklistService;
 import com.example.mmo_shop.service.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,8 +24,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @Autowired
-    private JwtBlacklistService jwtBlacklistService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -38,9 +35,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ") && !authorizationHeader.equals("Bearer null") && !authorizationHeader.equals("Bearer undefined")) {
             jwt = authorizationHeader.substring(7);
             username = jwtUtil.extractUsername(jwt);
-            if (jwtBlacklistService.isTokenBlacklisted(jwt)) {
-                return;
-            }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

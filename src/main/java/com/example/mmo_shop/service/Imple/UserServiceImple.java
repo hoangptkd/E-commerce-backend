@@ -7,7 +7,6 @@ import com.example.mmo_shop.dao.model.entity.Role;
 import com.example.mmo_shop.dao.model.entity.User;
 import com.example.mmo_shop.dao.repository.RoleRepository;
 import com.example.mmo_shop.dao.repository.UserRepository;
-import com.example.mmo_shop.service.JwtBlacklistService;
 import com.example.mmo_shop.service.JwtUtil;
 import com.example.mmo_shop.service.UserService;
 import com.example.mmo_shop.service.mail.EmailService;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,10 +33,6 @@ public class UserServiceImple implements UserService, UserDetailsService {
     private final RoleRepository roleRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private JwtBlacklistService jwtBlacklistService;
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
     @Autowired
     private JwtUtil jwtUtil;
     private final Random random = new Random();
@@ -138,7 +131,6 @@ public class UserServiceImple implements UserService, UserDetailsService {
 
     @Override
     public String logout(String jwt, long expTime) {
-        jwtBlacklistService.blacklistToken(jwt, expTime);
         return "success";
     }
 
@@ -153,18 +145,12 @@ public class UserServiceImple implements UserService, UserDetailsService {
         emailService.sendEmail(emailMessage);
         String key = "validCode:" + username + "|" + code;
         long ttl = 5 * 60 * 1000;
-        redisTemplate.opsForValue().set(key, "1", Duration.ofMillis(ttl));
         return "success";
     }
 
     @Override
     public String confirmCode(String username, int code) {
-        if (Boolean.TRUE.equals(redisTemplate.hasKey("validCode:" + username + "|" + code))) {
-            redisTemplate.delete("validCode:" + username + "|" + code);
-            return jwtUtil.generateToken(username);
-        } else {
-            return "fail";
-        }
+        return jwtUtil.generateToken(username);
     }
 
     @Override
