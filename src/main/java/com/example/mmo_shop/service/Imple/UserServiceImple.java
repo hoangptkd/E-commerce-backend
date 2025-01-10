@@ -10,7 +10,7 @@ import com.example.mmo_shop.dao.repository.UserRepository;
 import com.example.mmo_shop.service.JwtBlacklistService;
 import com.example.mmo_shop.service.JwtUtil;
 import com.example.mmo_shop.service.UserService;
-import com.example.mmo_shop.service.mail.KafkaProducer;
+import com.example.mmo_shop.service.mail.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,12 +39,12 @@ public class UserServiceImple implements UserService, UserDetailsService {
     @Autowired
     private JwtBlacklistService jwtBlacklistService;
     @Autowired
-    private KafkaProducer kafkaProducer;
-    @Autowired
     private RedisTemplate<String, Object> redisTemplate;
     @Autowired
     private JwtUtil jwtUtil;
     private final Random random = new Random();
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     public UserServiceImple(UserRepository userRepository, RoleRepository roleRepository) {
@@ -150,7 +150,7 @@ public class UserServiceImple implements UserService, UserDetailsService {
         }
         int code = 100000 + random.nextInt(900000);
         EmailMessage emailMessage = new EmailMessage(user.getGmail(), "Code", "Ma xac thuc: " + code);
-        kafkaProducer.sendMessage("send_email", emailMessage);
+        emailService.sendEmail(emailMessage);
         String key = "validCode:" + username + "|" + code;
         long ttl = 5 * 60 * 1000;
         redisTemplate.opsForValue().set(key, "1", Duration.ofMillis(ttl));
